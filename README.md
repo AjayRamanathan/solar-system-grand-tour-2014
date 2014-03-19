@@ -1,13 +1,7 @@
 # experiment
 
-FIXME: write description
+#Unit Kg, s and Km
+#az seems to be too high and equal to ax
+#Iteration wont work after 1st iteration
 
-## Usage
 
-FIXME: write
-
-## License
-
-Copyright (C) 2014 FIXME
-
-Distributed under the Eclipse Public License, the same as Clojure.

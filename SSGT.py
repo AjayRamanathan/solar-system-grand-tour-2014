@@ -22,7 +22,12 @@
 #THE SOFTWARE.
 
 #Unit Kg, s and Km
+#az seems to be too high
+#Iteration wont work after 1st iteration
+
 import xlwt, xlrd
+import numpy as np
+import math
 
 G = 6.67259*(10**-14)
 
@@ -107,68 +112,164 @@ Radius_Pluto_Fly_By = 7688.3160032
 Radius_Solar_System = 7311000000
 Radius_Probe_Max = 7311000000*1.2
 
+Input = xlrd.open_workbook('Input.xlsx')
+
+sun = Input.sheet_by_name('Sun')
+mercury = Input.sheet_by_name('Mercury')
+venus = Input.sheet_by_name('Venus')
+earth = Input.sheet_by_name('Earth')
+moon = Input.sheet_by_name('Moon')
+mars = Input.sheet_by_name('Mars')
+jupiter = Input.sheet_by_name('Jupiter')
+saturn = Input.sheet_by_name('Saturn')
+uranus = Input.sheet_by_name('Uranus')
+neptune = Input.sheet_by_name('Neptune')
+pluto = Input.sheet_by_name('Pluto')
+
 def main():
 
-	x,y,z = 1,1,1
+	m1 = 1000000
+	x = 10000 + int(earth.cell_value(0, 1))
+	y = 10000 + int(earth.cell_value(0, 2))
+	z = 10000 + int(earth.cell_value(0, 3))
 	vx,vy,vz = 0,0,0
 	ax,ay,az = 0,0,0
 	
 	book = xlwt.Workbook(encoding="utf-8")
-	sheet = book.add_sheet("Sheet 1")
-	
-	Input = xlrd.open_workbook('Input.xlsx')
-	sun = Input.sheet_by_name('Sun')
-	mercury = Input.sheet_by_name('Mercury')
-	venus = Input.sheet_by_name('Venus')
-	earth = Input.sheet_by_namek('Earth')
-	moon = Input.sheet_by_name('Moon')
-	mars = Input.sheet_by_name('Mars')
-	jupiter = Input.sheet_by_name('Jupiter')
-	saturn = Input.sheet_by_name('Saturn')
-	uranus = Input.sheet_by_name('Uranus')
-	neptune = Input.sheet_by_name('Neptune')
-	pluto = Input.sheet_by_name('Pluto')
+	sheet = book.add_sheet("Output")
 
-	for N in xrange(17520):
+	sheet.write(0,0,0)
+	sheet.write(0,1,x)
+	sheet.write(0,2,y)
+	sheet.write(0,3,z)
+	sheet.write(0,4,vx)
+	sheet.write(0,5,vy)
+	sheet.write(0,6,vz)
+	sheet.write(0,7,ax)
+	sheet.write(0,8,ay)
+	sheet.write(0,9,az)
 
-		Acceleration = getTotalAcceleration(x,y,z,N)
-		ax = Acceleration[0]
-		ax = Acceleration[1]
-		ax = Acceleration[2]
+	for N in xrange(17519):
+
+		foo = getTotalAcceleration(x,y,z,N)
+		ax = foo[0]
+		ay = foo[1]
+		az = foo[2]
 		x = x+(60*30*vx)+(60*60*60*60*ax)
-		x = x+(60*30*vy)+(60*60*60*60*ay)
-		x = x+(60*30*vz)+(60*60*60*60*az)
+		y = y+(60*30*vy)+(60*60*60*60*ay)
+		z = z+(60*30*vz)+(60*60*60*60*az)
 		vx = 60*60*ax
 		vy = 60*60*ay 
 		vz = 60*60*az
 
-		sheet.write(N,0,N)
-		sheet.write(N,1,x)
-		sheet.write(N,2,y)
-		sheet.write(N,3,z)
-		sheet.write(N,4,vx)
-		sheet.write(N,5,vy)
-		sheet.write(N,6,vz)
-		sheet.write(N,7,ax)
-		sheet.write(N,8,ay)
-		sheet.write(N,9,az)
+		sheet.write(N+1,0,N+1)
+		sheet.write(N+1,1,x)
+		sheet.write(N+1,2,y)
+		sheet.write(N+1,3,z)
+		sheet.write(N+1,4,vx)
+		sheet.write(N+1,5,vy)
+		sheet.write(N+1,6,vz)
+		sheet.write(N+1,7,ax)
+		sheet.write(N+1,8,ay)
+		sheet.write(N+1,9,az)
 
 	book.save("trial.xls")
 
 def getTotalAcceleration(x,y,z,N):
-	return [0,0,0]
+	Accel = np.asarray([0,0,0])
+	p1 = [x,y,z]
+	p1 = np.asarray(p1)
 
-def getAcceleration(p1,m1,p2,m2): #Calculates acceleration between two objects
+	a = sun.cell_value(N, 1)
+	b = sun.cell_value(N, 2)
+	c = sun.cell_value(N, 3)
+	p2 = [a,b,c]
+	p2 = np.asarray(p2)
+	Accel += getAcceleration(p1,p2,Mass_Sun )
+
+	a = mercury.cell_value(N, 1)
+	b = mercury.cell_value(N, 2)
+	c = mercury.cell_value(N, 3)
+	p2 = [a,b,c]
+	p2 = np.asarray(p2)
+	Accel += getAcceleration(p1,p2,Mass_Mercury)
+
+	a = venus.cell_value(N, 1)
+	b = venus.cell_value(N, 2)
+	c = venus.cell_value(N, 3)
+	p2 = [a,b,c]
+	p2 = np.asarray(p2)
+	Accel += getAcceleration(p1,p2,Mass_Venus)
+
+	a = earth.cell_value(N, 1)
+	b = earth.cell_value(N, 2)
+	c = earth.cell_value(N, 3)
+	p2 = [a,b,c]
+	p2 = np.asarray(p2)
+	Accel += getAcceleration(p1,p2,Mass_Earth)
+
+	a = moon.cell_value(N, 1)
+	b = moon.cell_value(N, 2)
+	c = moon.cell_value(N, 3)
+	p2 = [a,b,c]
+	p2 = np.asarray(p2)
+	Accel += getAcceleration(p1,p2,Mass_Moon)
+
+	a = mars.cell_value(N, 1)
+	b = mars.cell_value(N, 2)
+	c = mars.cell_value(N, 3)
+	p2 = [a,b,c]
+	p2 = np.asarray(p2)
+	Accel += getAcceleration(p1,p2,Mass_Mars)
+
+	a = jupiter.cell_value(N, 1)
+	b = jupiter.cell_value(N, 2)
+	c = jupiter.cell_value(N, 3)
+	p2 = [a,b,c]
+	p2 = np.asarray(p2)
+	Accel += getAcceleration(p1,p2,Mass_Jupiter)
+
+	a = saturn.cell_value(N, 1)
+	b = saturn.cell_value(N, 2)
+	c = saturn.cell_value(N, 3)
+	p2 = [a,b,c]
+	p2 = np.asarray(p2)
+	Accel += getAcceleration(p1,p2,Mass_Saturn)
+
+	a = uranus.cell_value(N, 1)
+	b = uranus.cell_value(N, 2)
+	c = uranus.cell_value(N, 3)
+	p2 = [a,b,c]
+	p2 = np.asarray(p2)
+	Accel += getAcceleration(p1,p2,Mass_Uranus)
+
+	a = neptune.cell_value(N, 1)
+	b = neptune.cell_value(N, 2)
+	c = neptune.cell_value(N, 3)
+	p2 = [a,b,c]
+	p2 = np.asarray(p2)
+	Accel += getAcceleration(p1,p2,Mass_Neptune)
+
+	a = pluto.cell_value(N, 1)
+	b = pluto.cell_value(N, 2)
+	c = pluto.cell_value(N, 3)
+	p2 = [a,b,c]
+	p2 = np.asarray(p2)
+	Accel += getAcceleration(p1,p2,Mass_Pluto)
+
+	return Accel
+
+def getAcceleration(p1,p2,m2): #Calculates acceleration between two objects
 	vector = p2-p1
-	radius = sqrt(vector.dot(vector))
+	radius = math.sqrt(vector.dot(vector))
 	acceleration = 0
-	if m1 != 0 and m2 != 0:
-	  acceleration = array(( vector * G*m1*m2 / radius**3 ))/m1  
+	acceleration = np.asarray(( vector * G*m2 / radius**3 )) 
+	#print acceleration
 	return acceleration   
 
 def getDistance(p1,p2): #calculates Distance between two objects
 	vector = p2-p1
-	distance = sqrt(vector.dot(vector))	
+	distance = math.sqrt(vector.dot(vector))	
 	return distance 
 
 if __name__ == '__main__': main()
