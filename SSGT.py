@@ -22,6 +22,7 @@
 #THE SOFTWARE.
 
 #Unit Kg, s and Km
+import xlwt, xlrd
 
 G = 6.67259*(10**-14)
 
@@ -108,11 +109,55 @@ Radius_Probe_Max = 7311000000*1.2
 
 def main():
 
-	x,y,z = 0,0,0
+	x,y,z = 1,1,1
 	vx,vy,vz = 0,0,0
 	ax,ay,az = 0,0,0
 	
+	book = xlwt.Workbook(encoding="utf-8")
+	sheet = book.add_sheet("Sheet 1")
 	
+	Input = xlrd.open_workbook('Input.xlsx')
+	sun = Input.sheet_by_name('Sun')
+	mercury = Input.sheet_by_name('Mercury')
+	venus = Input.sheet_by_name('Venus')
+	earth = Input.sheet_by_namek('Earth')
+	moon = Input.sheet_by_name('Moon')
+	mars = Input.sheet_by_name('Mars')
+	jupiter = Input.sheet_by_name('Jupiter')
+	saturn = Input.sheet_by_name('Saturn')
+	uranus = Input.sheet_by_name('Uranus')
+	neptune = Input.sheet_by_name('Neptune')
+	pluto = Input.sheet_by_name('Pluto')
+
+	for N in xrange(17520):
+
+		Acceleration = getTotalAcceleration(x,y,z,N)
+		ax = Acceleration[0]
+		ax = Acceleration[1]
+		ax = Acceleration[2]
+		x = x+(60*30*vx)+(60*60*60*60*ax)
+		x = x+(60*30*vy)+(60*60*60*60*ay)
+		x = x+(60*30*vz)+(60*60*60*60*az)
+		vx = 60*60*ax
+		vy = 60*60*ay 
+		vz = 60*60*az
+
+		sheet.write(N,0,N)
+		sheet.write(N,1,x)
+		sheet.write(N,2,y)
+		sheet.write(N,3,z)
+		sheet.write(N,4,vx)
+		sheet.write(N,5,vy)
+		sheet.write(N,6,vz)
+		sheet.write(N,7,ax)
+		sheet.write(N,8,ay)
+		sheet.write(N,9,az)
+
+	book.save("trial.xls")
+
+def getTotalAcceleration(x,y,z,N):
+	return [0,0,0]
+
 def getAcceleration(p1,m1,p2,m2): #Calculates acceleration between two objects
 	vector = p2-p1
 	radius = sqrt(vector.dot(vector))
